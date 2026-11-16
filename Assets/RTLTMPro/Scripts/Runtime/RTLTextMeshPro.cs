@@ -5,6 +5,11 @@ using Kyub.EmojiSearch.Utilities;
 using TMPro;
 using UnityEngine;
 
+#if RTL_LOCALIZATION
+using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
+#endif
+
 namespace RTLTMPro
 {
     [ExecuteInEditMode]
@@ -123,9 +128,31 @@ namespace RTLTMPro
         {
             base.OnEnable();
 
+#if RTL_LOCALIZATION
+            LocalizationSettings.SelectedLocaleChanged += OnSelectedLocaleChanged;
+            // The selected locale may have changed while this text was disabled.
+            havePropertiesChanged = true;
+#endif
+
             if (updateTextOnEnable)
                 UpdateText();
         }
+
+#if RTL_LOCALIZATION
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+
+            LocalizationSettings.SelectedLocaleChanged -= OnSelectedLocaleChanged;
+        }
+
+        // The digits follow the selected locale (see RTLNumberFixer), so the text is fixed again when it
+        // changes. The fix cache keys on the locale, so Update() re-fixes instead of reusing the old text.
+        private void OnSelectedLocaleChanged(Locale locale)
+        {
+            havePropertiesChanged = true;
+        }
+#endif
 
         public void UpdateText()
         {
