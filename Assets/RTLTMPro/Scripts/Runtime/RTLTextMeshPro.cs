@@ -178,8 +178,9 @@ namespace RTLTMPro
         {
             isRightToLeftText = isRightToLeft;
             base.text = fixedText;
-
-            havePropertiesChanged = false;
+            // Do not clear havePropertiesChanged here: TMP only builds the mesh while it is set, and clears it
+            // itself once the mesh is built. Clearing it left texts set while inactive (and 3D texts) without
+            // a mesh, and TMP then threw in UpdateSDFScale when such a text was scaled.
         }
 
         private string GetFixedText(string input)
